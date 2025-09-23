@@ -41,8 +41,21 @@ int main(int argc, char **argv)
 
     // =======================   ndt   =======================
     // 补全相关代码
-
+    pcl::NormalDistributionsTransform<pcl::PointXYZ, pcl::PointXYZ> ndt;
+    ndt.setResolution(1.0); // 设置NDT网格分辨率
+    ndt.setInputTarget(target_cloud); // 设置目标点云
+    ndt.setInputSource(filter_cloud); // 设置源点云（已滤波）
+    ndt.setMaximumIterations(35); // 设置最大迭代次数
+    ndt.setStepSize(0.1); // 设置步长
+    ndt.setTransformationEpsilon(1e-8); // 设置收敛条件
     
+    // 执行配准
+    ndt.align(*output_cloud, init_guss);
+    
+    std::cout << "\n============== NDT =================" << std::endl;
+    std::cout << "has converged: " << ndt.hasConverged() << std::endl;
+    std::cout << "final transformation matrix:\n" << ndt.getFinalTransformation() << std::endl;
+    std::cout << "fitness score: " << ndt.getFitnessScore() << std::endl;
     // =======================   ndt   =======================
     
 

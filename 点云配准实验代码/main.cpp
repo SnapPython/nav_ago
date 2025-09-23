@@ -31,8 +31,15 @@ int main()
 
     // =======================   optimized icp   =======================
     // 补全相关代码
-
-    
+    OptimizedICPGN optimized_icp;
+    optimized_icp.SetMaxIterations(30);
+    optimized_icp.SetMaxCorrespondDistance(0.3);
+    optimized_icp.SetTransformationEpsilon(1e-4);
+    optimized_icp.SetTargetCloud(cloud_target_ptr);
+    optimized_icp.Match(cloud_source_ptr, T_predict, cloud_source_opti_transformed_ptr, T_final);
+    std::cout << "\n============== Optimized ICP =================" << std::endl;
+    std::cout << "T final: \n" << T_final << std::endl;
+    std::cout << "fitness score: " << optimized_icp.GetFitnessScore() << std::endl;
     // =======================   optimized icp   =======================
 
     // =======================   svd icp   =======================
