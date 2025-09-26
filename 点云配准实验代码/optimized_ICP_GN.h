@@ -8,6 +8,8 @@
 #include <eigen3/Eigen/Core>
 #include <pcl/common/transforms.h>
 #include <pcl/kdtree/kdtree_flann.h>
+#include <pcl/visualization/pcl_visualizer.h>
+#include <mutex>
 
 class OptimizedICPGN
 {
@@ -22,8 +24,16 @@ public:
                const Eigen::Matrix4f &predict_pose,
                pcl::PointCloud<pcl::PointXYZ>::Ptr &transformed_source_cloud_ptr,
                Eigen::Matrix4f &result_pose);
+    
+    bool MatchWithVisualization(const pcl::PointCloud<pcl::PointXYZ>::Ptr &source_cloud_ptr,
+                               const Eigen::Matrix4f &predict_pose,
+                               pcl::PointCloud<pcl::PointXYZ>::Ptr &transformed_source_cloud_ptr,
+                               Eigen::Matrix4f &result_pose,
+                               boost::shared_ptr<pcl::visualization::PCLVisualizer> &viewer,
+                               int visualize_interval = 1,
+                               int viewport = 0);
 
-    float GetFitnessScore(float max_range = std::numeric_limits<float>::max()) const;
+    float GetFitnessScore(const pcl::PointCloud<pcl::PointXYZ>::Ptr &source_cloud_ptr, float max_range = std::numeric_limits<float>::max()) const;
 
     void SetMaxIterations(unsigned int iter);
 
@@ -50,10 +60,12 @@ private:
     bool has_converge_ = false;
 
     pcl::PointCloud<pcl::PointXYZ>::Ptr target_cloud_ptr_ = nullptr;
-    pcl::PointCloud<pcl::PointXYZ>::Ptr source_cloud_ptr_ = nullptr;
     Eigen::Matrix4f final_transformation_;
 
     pcl::KdTreeFLANN<pcl::PointXYZ>::Ptr kdtree_flann_ptr_ = nullptr; // In order to search
+    
+    // 互斥锁，用于保护可视化操作
+    std::mutex viewer_mutex_;
 };
 
 #endif //OPTIMIZED_ICP_GN_H
